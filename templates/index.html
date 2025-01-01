@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Entry Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        .form-group {
+            flex: 1 1 45%; /* Adjust to ensure two columns */
+            display: flex;
+            align-items: center;
+        }
+        .label-container {
+            text-align: right;
+            padding: 5px;
+            margin-right: 10px;
+            width: 40%; /* Adjust to ensure proper alignment */
+            box-sizing: border-box;
+        }
+        input, select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            flex: 1;
+            width: 100%; /* Ensure it takes up available space */
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: blue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 20px;
+            flex: 1 1 100%; /* Make button take full width */
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+    
+</head>
+<body>
+    
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('submit') }}" method="post">
+        {% set form_data = form_data or {} %}
+        <div class="form-group">
+            <div class="label-container">Status:</div>
+            <select name="status" required>
+                <option value="">Select Status</option>
+                <option value="Done" {% if form_data and form_data.get('status') == 'Done' %}selected{% endif %}>Done</option>
+                <option value="Cancel" {% if form_data and form_data.get('status') == 'Cancel' %}selected{% endif %}>Cancel</option>
+                <option value="Reserved" {% if form_data and form_data.get('status') == 'Reserved' %}selected{% endif %}>Reserved</option>
+                <option value="Pending" {% if form_data and form_data.get('status') == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Free Guest" {% if form_data and form_data.get('status') == 'Free Guest' %}selected{% endif %}>Free Guest</option>
+                <option value="Refund" {% if form_data and form_data.get('status') == 'Refund' %}selected{% endif %}>Refund</option>
+                <option value="Move Date" {% if form_data and form_data.get('status') == 'Move Date' %}selected{% endif %}>Move Date</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Source of Booking:</div>
+            <select name="source_of_booking" required>
+                <option value="">Select Source</option>
+                <option value="FB" {% if form_data and form_data.get('source_of_booking') == 'FB' %}selected{% endif %}>FB</option>
+                <option value="Instagram" {% if form_data and form_data.get('source_of_booking') == 'Instagram' %}selected{% endif %}>Instagram</option>
+                <option value="Call" {% if form_data and form_data.get('source_of_booking') == 'Call' %}selected{% endif %}>Call</option>
+                <option value="Text" {% if form_data and form_data.get('source_of_booking') == 'Text' %}selected{% endif %}>Text</option>
+                <option value="Tiktok" {% if form_data and form_data.get('source_of_booking') == 'Tiktok' %}selected{% endif %}>Tiktok</option>
+                <option value="AirBnB" {% if form_data and form_data.get('source_of_booking') == 'AirBnB' %}selected{% endif %}>AirBnB</option>
+                <option value="Agoda" {% if form_data and form_data.get('source_of_booking') == 'Agoda' %}selected{% endif %}>Agoda</option>
+                <option value="Booking.com" {% if form_data and form_data.get('source_of_booking') == 'Booking.com' %}selected{% endif %}>Booking.com</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Date:</div>
+            <input type="date" name="date" value="{{ form_data.get('date', '') }}" placeholder="Date" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Name:</div>
+            <input type="text" name="name" value="{{ form_data.get('name', '') }}" placeholder="Name" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Reservation Date:</div>
+            <input type="date" name="reservation_date" value="{{ form_data.get('reservation_date', '') }}" placeholder="Reservation Date" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Contact:</div>
+            <input type="number" name="contact" value="{{ form_data.get('contact', '') }}" placeholder="Contact" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">In:</div>
+            <input type="time" name="in" value="{{ form_data.get('in', '') }}" placeholder="In" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Out:</div>
+            <input type="time" name="out" value="{{ form_data.get('out', '') }}" placeholder="Out" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Day:</div>
+            <input type="number" name="day" value="{{ form_data.get('day', '') }}" placeholder="Day" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Night:</div>
+            <input type="number" name="night" value="{{ form_data.get('night', '') }}" placeholder="Night" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Adult:</div>
+            <input type="number" name="adult" value="{{ form_data.get('adult', '') }}" placeholder="Adult" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Children:</div>
+            <input type="number" name="children" value="{{ form_data.get('children', '') }}" placeholder="Children" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Student:</div>
+            <input type="number" name="student" value="{{ form_data.get('student', '') }}" placeholder="Student" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Videoke:</div>
+            <input type="text" name="videoke" value="{{ form_data.get('videoke', '') }}" placeholder="Videoke" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Room:</div>
+            <input type="text" name="room" value="{{ form_data.get('room', '') }}" placeholder="Room" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Room #:</div>
+            <input type="text" name="room_number" value="{{ form_data.get('room_number', '') }}" placeholder="Room #" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Cottage No:</div>
+            <input type="text" name="cottage_no" value="{{ form_data.get('cottage_no', '') }}" placeholder="Cottage No" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Pax:</div>
+            <input type="number" name="pax" value="{{ form_data.get('pax', '') }}" placeholder="Pax" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Receptionist:</div>
+            <input type="text" name="receptionist" value="{{ form_data.get('receptionist', '') }}" placeholder="Receptionist" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Downpayment:</div>
+            <input type="number" name="downpayment" value="{{ form_data.get('downpayment', '') }}" placeholder="Downpayment" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Gcash (Reference#):</div>
+            <input type="text" name="gcash" value="{{ form_data.get('gcash', '') }}" placeholder="Gcash (Reference#)" required>
+        </div>
+        <div class="form-group">
+            <div class="label-container">Full Payment:</div>
+            <input type="number" name="full_payment" value="{{ form_data.get('full_payment', '') }}" placeholder="Full Payment" required>
+        </div>
+        <!-- Save Button -->
+        <button type="submit">Save</button>
+        
+    </form>
+    
+</body>
+</html>
