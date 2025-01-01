@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Existing Records</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Reference to the CSS file -->
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .actions {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <a href="{{ url_for('new') }}">New</a>
+        <a href="{{ url_for('record') }}">Record</a>
+    </div>
+    <h2>Existing Data</h2>
+    <table>
+        <tr>
+            <!-- Add your headers here -->
+            <th>Status</th>
+            <th>Source of Booking</th>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Reservation Date</th>
+            <th>Contact</th>
+            <th>In</th>
+            <th>Out</th>
+            <th>Day</th>
+            <th>Night</th>
+            <th>Adult</th>
+            <th>Children</th>
+            <th>Student</th>
+            <th>Videoke</th>
+            <th>Room</th>
+            <th>Room Number</th>
+            <th>Cottage No</th>
+            <th>Pax</th>
+            <th>Receptionist</th>
+            <th>Downpayment</th>
+            <th>Gcash</th>
+            <th>Full Payment</th>
+            <th>Actions</th>
+        </tr>
+        {% for row in data %}
+        <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+            <td class="actions">
+                <form action="{{ url_for('delete', row=loop.index0) }}" method="post">
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
