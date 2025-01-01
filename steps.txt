@@ -1,6 +1,0 @@
-install python with the needed pre requisites.
-
-open cmd- enter the commands
-cd C:\Users\hrjgc\OneDrive\Documents\ManaloK9
-python app.py
-this should start python
