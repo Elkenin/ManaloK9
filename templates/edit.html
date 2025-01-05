@@ -7,15 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <header class="top-nav">
-        <div class="nav-left">
-            <!-- You can add something else here if you want later -->
-        </div>
-        <div class="nav-right">
-            <a href="{{ url_for('new') }}">New</a>
-            <a href="{{ url_for('record') }}">Record</a>
-        </div>
-    </header>
+    <div class="menu"> <a href="{{ url_for('new') }}">New</a> <a href="{{ url_for('record') }}">Record</a>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <div class="alert">
@@ -25,7 +17,7 @@
             </div>
         {% endif %}
     {% endwith %}
-    <form action="{{ url_for('submit') }}" method="post">
+    <form action="{{ url_for('edit') }}" method="post">
         {% set form_data = data or {} %}  {% set form_data = data or {} %}
         <div class="form-group">
             <div class="label-container">Status:</div>

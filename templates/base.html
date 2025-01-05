@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Default Title{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('record') }}">Records</a>
+            <a href="{{ url_for('new') }}">New Entry</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Child templates inject content here -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Manalo K9 Tracker. All rights reserved.</p>
+    </footer>
+</body>
+</html>
