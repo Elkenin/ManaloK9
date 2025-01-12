@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manalo K9 Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            display: flex;
+        }
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+        }
+        .form-container {
+            flex: 1;
+        }
+        .data-display {
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fff;
+            overflow-y: auto;
+        }
+        .form-section {
+            display: grid;
+            grid-template-columns: 50% 50%;
+            gap: 15px;
+        }
+        label {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            grid-column: span 2;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left: Data Entry Form -->
+        <div class="form-container">
+            <h1>Manalo K9 Tracker</h1>
+            <form id="dataForm">
+                <div class="form-section">
+                    <!-- Left Column -->
+                    <label>Status:
+                        <input type="text" name="status" required>
+                    </label>
+                    <label>Date:
+                        <input type="date" name="date" required>
+                    </label>
+                    <label>Name:
+                        <input type="text" name="name" required>
+                    </label>
+                    <label>Contact:
+                        <input type="text" name="contact" required>
+                    </label>
+                    <label>Reservation Date:
+                        <input type="date" name="reservationDate" required>
+                    </label>
+                    <label>Check-In:
+                        <input type="date" name="in" required>
+                    </label>
+                    <label>Check-Out:
+                        <input type="date" name="out" required>
+                    </label>
+                    <label>Day:
+                        <input type="number" name="day" required>
+                    </label>
+                    <label>Night:
+                        <input type="number" name="night" required>
+                    </label>
+                    <label>Receptionist:
+                        <input type="text" name="receptionist" required>
+                    </label>
+
+                    <!-- Right Column -->
+                    <label>Adult:
+                        <input type="number" name="adult" required>
+                    </label>
+                    <label>Children:
+                        <input type="number" name="children" required>
+                    </label>
+                    <label>Student:
+                        <input type="number" name="student" required>
+                    </label>
+                    <label>Videoke:
+                        <input type="text" name="videoke">
+                    </label>
+                    <label>Room:
+                        <input type="text" name="room" required>
+                    </label>
+                    <label>Room #:
+                        <input type="text" name="roomNumber" required>
+                    </label>
+                    <label>Cottage:
+                        <input type="text" name="cottage">
+                    </label>
+                    <label>No. Pax:
+                        <input type="number" name="noPax" required>
+                    </label>
+                    <label>Downpayment:
+                        <input type="number" name="downpayment">
+                    </label>
+                    <label>GCash (Reference#):
+                        <input type="text" name="gcash">
+                    </label>
+                    <label>Full Payment:
+                        <input type="number" name="fullPayment">
+                    </label>
+                    <label>Total:
+                        <input type="number" name="total">
+                    </label>
+                </div>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <!-- Right: Current Data -->
+        <div class="data-display">
+            <h2>Current Data</h2>
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Reservation Date</th>
+                        <th>Check-In</th>
+                        <th>Check-Out</th>
+                        <th>Day</th>
+                        <th>Night</th>
+                        <th>Receptionist</th>
+                        <th>Adult</th>
+                        <th>Children</th>
+                        <th>Student</th>
+                        <th>Videoke</th>
+                        <th>Room</th>
+                        <th>Room #</th>
+                        <th>Cottage</th>
+                        <th>No. Pax</th>
+                        <th>Downpayment</th>
+                        <th>GCash</th>
+                        <th>Full Payment</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be added dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("dataForm");
+        const tableBody = document.getElementById("dataTable").querySelector("tbody");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(form);
+            const response = await fetch("http://127.0.0.1:5000/submit", {
+                method: "POST",
+                body: formData
+            });
+            const result = await response.json();
+
+            if (result.message) {
+                alert(result.message); // Show popup message
+            }
+
+            // Update table with new data
+            tableBody.innerHTML = "";
+            result.data.forEach((row) => {
+                const tr = document.createElement("tr");
+                row.forEach((cell) => {
+                    const td = document.createElement("td");
+                    td.textContent = cell;
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+
+            form.reset(); // Reset the form fields
+        });
+
+        // Load initial data
+        async function loadData() {
+            const response = await fetch("http://127.0.0.1:5000/submit", {
+                method: "POST"
+            });
+            const result = await response.json();
+
+            if (result.data) {
+                result.data.forEach((row) => {
+                    const tr = document.createElement("tr");
+                    row.forEach((cell) => {
+                        const td = document.createElement("td");
+                        td.textContent = cell;
+                        tr.appendChild(td);
+                    });
+                    tableBody.appendChild(tr);
+                });
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
