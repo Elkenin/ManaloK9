@@ -55,10 +55,17 @@
         button:hover {
             background-color: #45a049;
         }
+        .filter-input {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         th, td {
             border: 1px solid #ddd;
@@ -67,6 +74,10 @@
         }
         th {
             background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -154,6 +165,12 @@
         <!-- Right: Current Data -->
         <div class="data-display">
             <h2>Current Data</h2>
+            <input
+                type="text"
+                class="filter-input"
+                id="filterInput"
+                placeholder="Search in table..."
+            />
             <table id="dataTable">
                 <thead>
                     <tr>
@@ -191,53 +208,71 @@
     <script>
         const form = document.getElementById("dataForm");
         const tableBody = document.getElementById("dataTable").querySelector("tbody");
+        const filterInput = document.getElementById("filterInput");
 
+        // Handle form submission
         form.addEventListener("submit", async (event) => {
-            event.preventDefault(); // Prevent the default form submission
+            event.preventDefault();
 
             const formData = new FormData(form);
             const response = await fetch("http://127.0.0.1:5000/submit", {
                 method: "POST",
-                body: formData
+                body: formData,
             });
             const result = await response.json();
 
             if (result.message) {
-                alert(result.message); // Show popup message
+                alert(result.message);
             }
 
-            // Update table with new data
+            updateTable(result.data);
+            form.reset();
+        });
+
+        // Update table with new data
+        function updateTable(data) {
             tableBody.innerHTML = "";
-            result.data.forEach((row) => {
+            data.forEach((row) => {
                 const tr = document.createElement("tr");
                 row.forEach((cell) => {
                     const td = document.createElement("td");
                     td.textContent = cell;
                     tr.appendChild(td);
                 });
+                // Add click event to populate form
+                tr.addEventListener("click", () => populateForm(row));
                 tableBody.appendChild(tr);
             });
+        }
 
-            form.reset(); // Reset the form fields
+        // Populate form with row data
+        function populateForm(row) {
+            const fields = Array.from(form.elements).filter((el) => el.name);
+            fields.forEach((field, index) => {
+                field.value = row[index] || "";
+            });
+        }
+
+        // Filter table rows
+        filterInput.addEventListener("input", () => {
+            const filter = filterInput.value.toLowerCase();
+            const rows = tableBody.querySelectorAll("tr");
+            rows.forEach((row) => {
+                const rowText = Array.from(row.cells)
+                    .map((cell) => cell.textContent.toLowerCase())
+                    .join(" ");
+                row.style.display = rowText.includes(filter) ? "" : "none";
+            });
         });
 
         // Load initial data
         async function loadData() {
             const response = await fetch("http://127.0.0.1:5000/submit", {
-                method: "POST"
+                method: "POST",
             });
             const result = await response.json();
-
             if (result.data) {
-                result.data.forEach((row) => {
-                    const tr = document.createElement("tr");
-                    row.forEach((cell) => {
-                        const td = document.createElement("td");
-                        td.textContent = cell;
-                        tr.appendChild(td);
-                    });
-                    tableBody.appendChild(tr);
-                });
+                updateTable(result.data);
             }
         }
 
