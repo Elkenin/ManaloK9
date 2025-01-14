@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manalo K9 Tracker</title>
+    <title>Data Entry Form</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -55,6 +55,10 @@
         button:hover {
             background-color: #45a049;
         }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
         .filter-input {
             margin-bottom: 10px;
             padding: 8px;
@@ -87,8 +91,10 @@
         <div class="form-container">
             <h1>Manalo K9 Tracker</h1>
             <form id="dataForm">
+
+                <input type="hidden" name="uniqueId" id="uniqueId">
+
                 <div class="form-section">
-                    <!-- Left Column -->
                     <label>Status:
                         <input type="text" name="status" required>
                     </label>
@@ -119,8 +125,6 @@
                     <label>Receptionist:
                         <input type="text" name="receptionist" required>
                     </label>
-
-                    <!-- Right Column -->
                     <label>Adult:
                         <input type="number" name="adult" required>
                     </label>
@@ -158,7 +162,9 @@
                         <input type="number" name="total">
                     </label>
                 </div>
-                <button type="submit">Submit</button>
+                <button type="submit" id="submitButton">Submit</button>
+                <button type="button" id="updateButton" disabled>Update</button>
+                <button type="button" id="deleteButton" disabled>Delete</button>
             </form>
         </div>
 
@@ -209,6 +215,9 @@
         const form = document.getElementById("dataForm");
         const tableBody = document.getElementById("dataTable").querySelector("tbody");
         const filterInput = document.getElementById("filterInput");
+        const submitButton = document.getElementById("submitButton");
+        const updateButton = document.getElementById("updateButton");
+        let selectedRow = null;
 
         // Handle form submission
         form.addEventListener("submit", async (event) => {
@@ -234,16 +243,32 @@
             tableBody.innerHTML = "";
             data.forEach((row) => {
                 const tr = document.createElement("tr");
-                row.forEach((cell) => {
+                tr.dataset.uniqueId = row[0]; // Assuming the first item is the unique ID
+                row.slice(1).forEach((cell) => {
                     const td = document.createElement("td");
                     td.textContent = cell;
                     tr.appendChild(td);
                 });
-                // Add click event to populate form
-                tr.addEventListener("click", () => populateForm(row));
+                tr.addEventListener("click", () => selectRow(tr, row));
                 tableBody.appendChild(tr);
             });
         }
+
+
+        // Select a row for updating
+        function selectRow(tr, row) {
+            if (selectedRow) {
+                selectedRow.classList.remove("selected");
+            }
+            selectedRow = tr;
+            selectedRow.classList.add("selected");
+            document.getElementById("uniqueId").value = tr.dataset.uniqueId; // Set hidden UID
+            updateButton.disabled = false; // Enable Update button
+            deleteButton.disabled = false; // Enable Delete button
+            populateForm(row); // Populate form with selected row data
+        }
+
+
 
         // Populate form with row data
         function populateForm(row) {
@@ -252,6 +277,65 @@
                 field.value = row[index] || "";
             });
         }
+
+        // Handle row updating
+        updateButton.addEventListener("click", async () => {
+        if (!selectedRow) {
+            alert("No row selected for update!");
+            return;
+        }
+
+        const formData = new FormData(form);
+        const response = await fetch("http://127.0.0.1:5000/submit", {
+            method: "POST",
+            body: formData,
+        });
+        const result = await response.json();
+
+        if (result.message) {
+            alert(result.message);
+        }
+
+        updateTable(result.data);
+        form.reset();
+        updateButton.disabled = true;
+        selectedRow = null;
+        });
+
+        // Select the delete button
+        const deleteButton = document.getElementById("deleteButton");
+
+        // Handle row deletion
+        deleteButton.addEventListener("click", async () => {
+            if (!selectedRow) {
+                alert("No row selected for deletion!");
+                return;
+            }
+
+            const uniqueId = selectedRow.dataset.uniqueId; // Retrieve the UID from the selected row
+            const formData = new FormData();
+            formData.append("uniqueId", uniqueId);
+
+            const response = await fetch("http://127.0.0.1:5000/delete", {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            if (result.message) {
+                alert(result.message);
+            }
+
+            updateTable(result.data); // Refresh the table
+            form.reset(); // Reset the form
+            updateButton.disabled = true; // Disable the Update button
+            deleteButton.disabled = true; // Disable the Delete button
+            selectedRow = null; // Clear the selection
+        });
+
+
+
 
         // Filter table rows
         filterInput.addEventListener("input", () => {
